@@ -36,7 +36,7 @@ labelOneBtn.addEventListener("click", () => classifier.addImage(document.getElem
 labelThreeBtn.addEventListener("click", () => classifyImage());
 
 save.addEventListener("click", () => featureExtractor.save());
-load.addEventListener("click", () => featureExtractor.load('https://github.com/thomasmartini/Dog-Detective/model.json', customModelLoaded));
+load.addEventListener("click", () => featureExtractor.load('https://thomasmartini.github.io/Dog-Detective/model.json', customModelLoaded));
 
 function classifyImage(){
     classifier.classify(document.getElementById("output")).then((results) => {
