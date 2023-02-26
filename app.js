@@ -2,6 +2,14 @@
 const featureExtractor = ml5.featureExtractor('MobileNet', modelLoaded);
 const classifierml5 = ml5.imageClassifier('MobileNet', modelLoaded);
 
+const image = document.getElementById('output')
+const classifier = featureExtractor.classification(image);
+const label = document.getElementById("label");
+const score = document.getElementById("score");
+const labelThreeBtn = document.querySelector("#labelThree");
+const fileButton = document.querySelector("#file")
+let scoreNumer = 0;
+
 let synth = window.speechSynthesis
 
 function speak(text) {
@@ -20,55 +28,36 @@ function speak(text) {
 function modelLoaded() {
     console.log('Model Loaded!');
 }
-function customModelLoaded() {
+function loadCustomModel() {
+    featureExtractor.load('https://thomasmartini.github.io/Dog-Detective/model.json');
     console.log('custom model loaded');
+    speak("welcome to dog detective. take a picture of a dog and i will tell you if it is a dog or not.");
 }
 
-const label = document.getElementById("label");
-
-const labelOneBtn = document.querySelector("#labelOne");
-const labelThreeBtn = document.querySelector("#labelThree");
-const trainbtn = document.querySelector("#train");
-const save = document.querySelector("#save");
-const load = document.querySelector("#load");
-
-labelOneBtn.addEventListener("click", () => classifier.addImage(document.getElementById("output"), 'dog'));
 labelThreeBtn.addEventListener("click", () => classifyImage());
 
-save.addEventListener("click", () => featureExtractor.save());
-load.addEventListener("click", () => featureExtractor.load('https://thomasmartini.github.io/Dog-Detective/model.json', customModelLoaded));
-
-function classifyImage(){
+function classifyImage() {
     classifier.classify(document.getElementById("output")).then((results) => {
         console.log(results);
-        if(results[0].confidence > 0.85 && results[0].label == "dog"){
-        label.innerText = "This is a " + results[0].label + ". Well done";
-        speak(label.innerText);
-}
-else{
-    classifierml5.classify(document.getElementById("output")).then((results) => {
-        console.log(results);
-        label.innerText = "This is not a dog, this is a " + results[0].label + ". Try again";
-        speak(label.innerText);
+        if (results[0].confidence > 0.85 && results[0].label == "dog") {
+            label.innerText = "This is a " + results[0].label + ". Well done";
+            speak(label.innerText);
+            scoreNumer += 1;
+            score.innerText = "Your Score: " + scoreNumer;
+        }
+        else {
+            classifierml5.classify(document.getElementById("output")).then((results) => {
+                console.log(results);
+                label.innerText = "This is not a dog, this is a " + results[0].label + ". Try again";
+                speak(label.innerText);
+            });
+        }
     });
 }
-});
-}
 
-trainbtn.addEventListener("click", () => classifier.train((lossValue) => {
-    console.log('Loss is', lossValue)
-    }
-    ));
-
-const image = document.getElementById('output')
-const classifier = featureExtractor.classification(image);
-
-
-const fileButton = document.querySelector("#file")
-
-fileButton.addEventListener("change", (event)=>{
+fileButton.addEventListener("change", (event) => {
     image.src = URL.createObjectURL(event.target.files[0])
 })
 
-label.innerText = "Take a picture of a dog";
-speak(label.innerHTML);
+label.innerText = "Take a picture of a dog!";
+loadCustomModel();
